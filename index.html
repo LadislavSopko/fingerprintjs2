@@ -61,19 +61,38 @@
   <p>Time took to calculate the fingerprint: <var id="time"></var> ms</p>
   <p><strong>Detailed information: </strong></p>
   <pre id="details"></pre>
+  <pre id="canvasImg"></pre>
+  <pre id="webglImg"></pre>
   <pre id="data"></pre>
-  <div id id="geolocate">
-    <button id = "find-me">Show my location</button><br/>
-    <p id = "status"></p>
-    <a id = "map-link" target="_blank"></a>
-  </div>
-  <script src="fingerprint2.js"></script>
+  
+  <script src="fingerprint2.js?a=3"></script>
   <script>
     var hasConsole = typeof console !== "undefined"
 
     var fingerprintReport = function () {
       var d1 = new Date()
-      Fingerprint2.get(  function(components) {
+      Fingerprint2.get(
+        {
+          screen: {
+            // To ensure consistent fingerprints when users rotate their mobile devices
+            detectScreenOrientation: true
+          },
+          excludes: {
+            // Unreliable on Windows, see https://github.com/Valve/fingerprintjs2/issues/375
+            'enumerateDevices': true,
+            // devicePixelRatio depends on browser zoom, and it's impossible to detect browser zoom
+            'pixelRatio': true,
+            // DNT depends on incognito mode for some browsers (Chrome) and it's impossible to detect incognito mode
+            'doNotTrack': true,
+            // uses js fonts already
+            'fontsFlash': true,
+
+            // dual monitor false positive
+            'screenResolution': true,
+            'availableScreenResolution': true,
+            'hasLiedResolution': true
+          }
+        },  function(components) {
         var murmur = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value }).join(), 31)
         var d2 = new Date()
         var time = d2 - d1
@@ -90,13 +109,39 @@
         }
         for (var index in components) {
           var obj = components[index]
-          var line = obj.key + " = " + String(obj.value).substr(0, 100)
+          var line = '';
+
+          if(obj.key == 'canvas'){
+              if(obj.value && obj.value.length > 1){
+                var image = document.createElement("img");
+                image.src = obj.value[1];  
+                image.id = "00";        
+                document.querySelector("#canvasImg").appendChild(image);
+              }
+                
+              line = obj.key + " = " + String(obj.value).substr(0, 1000000);
+              
+          } else if(obj.key == 'webgl'){
+              if(obj.value && obj.value.length > 0){
+                var image1 = document.createElement("img");
+                image1.src = obj.value[0];  
+                image1.id = "11";       
+                document.querySelector("#webglImg").appendChild(image1);
+                
+              }
+
+              line = obj.key + " = " + String(obj.value).substr(0, 1000000);
+          } else {
+              line = obj.key + " = " + String(obj.value).substr(0, 1000000);
+          }
+
+          
           if (hasConsole) {
             console.log(line)
           }
           details += line + "\n"
 
-          fpData += fpSep + encodeURI(String(obj.value).substr(0, 100));
+          fpData += fpSep + encodeURI(String(obj.value).substr(0, 1000000));
         }
 
         fpData += "\"]";
@@ -119,13 +164,7 @@
       cancelFunction = clearTimeout
     }
 
-    document.querySelector("#btn").addEventListener("click", function () {
-      if (cancelId) {
-        cancelFunction(cancelId)
-        cancelId = undefined
-      }
-      fingerprintReport()
-    })
+    
   </script>
 </body>
 </html>

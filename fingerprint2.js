@@ -437,7 +437,7 @@
   }
   var getAvailableScreenResolution = function (options) {
     if (window.screen.availWidth && window.screen.availHeight) {
-      var available = [window.screen.availHeight, window.screen.availWidth]
+      var available = [window.screen.availWidth, window.screen.availHeight]
       if (options.screen.detectScreenOrientation) {
         available.sort().reverse()
       }
@@ -957,7 +957,7 @@
     ctx.arc(75, 75, 25, 0, Math.PI * 2, true)
     ctx.fill('evenodd')
 
-    if (canvas.toDataURL) { result.push('canvas fp:' + canvas.toDataURL()) }
+    if (canvas.toDataURL) { result.push(canvas.toDataURL()) }
     return result
   }
   var getWebglFp = function () {
@@ -1120,7 +1120,15 @@
     return false
   }
   var getHasLiedResolution = function () {
-    return window.screen.width < window.screen.availWidth || window.screen.height < window.screen.availHeight
+    // fix: laco we need sort resolution first due to mobile orientations
+    var available = [window.screen.availWidth, window.screen.availHeight]
+    available.sort().reverse()
+    var resolution = [window.screen.width, window.screen.height]
+    resolution.sort().reverse()   
+
+    return resolution[0] < available[0] || resolution[1] < available[1]
+
+    //return window.screen.width < window.screen.availWidth || window.screen.height < window.screen.availHeight
   }
   var getHasLiedOs = function () {
     var userAgent = navigator.userAgent.toLowerCase()

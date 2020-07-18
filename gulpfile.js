@@ -1,5 +1,6 @@
 const gulp = require('gulp')
 const rename = require('gulp-rename')
+const babel = require('gulp-babel')
 const uglify = require('gulp-uglify')
 const license = require('gulp-header-license')
 const fs = require('fs')
@@ -9,6 +10,9 @@ gulp.task('minify', function () {
   return gulp
       .src(['fingerprint2.js', 'geolocate.js'])
       .pipe(rename({suffix: '.min'}))
+      .pipe(babel({
+        presets: ['@babel/env']
+      }))
       .pipe(uglify({
         ie8: true,
         compress: {
