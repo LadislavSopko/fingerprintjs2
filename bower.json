@@ -3,7 +3,7 @@
   "description": "Modern & flexible browser fingerprinting library",
   "main": "fingerprint2.js",
   "moduleType": [
-    "es6"
+    "es5"
   ],
   "keywords": [
     "fraud",

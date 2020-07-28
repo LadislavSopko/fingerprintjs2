@@ -8,11 +8,8 @@ const year = (new Date()).getFullYear()
 
 gulp.task('minify', function () {
   return gulp
-      .src(['fingerprint2.js', 'geolocate.js'])
-      .pipe(rename({suffix: '.min'}))
-      .pipe(babel({
-        presets: ['@babel/env']
-      }))
+      .src(['fingerprint2.js'])
+      .pipe(rename({suffix: '-min'}))
       .pipe(uglify({
         ie8: true,
         compress: {
